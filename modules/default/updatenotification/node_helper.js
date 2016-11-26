@@ -1,4 +1,8 @@
-var simpleGit = require("simple-git")(__dirname + "/../..");
+var SimpleGit = require("simple-git");
+var simpleGits = [];
+var fs = require("fs");
+var path = require("path");
+var defaultModules = require(__dirname + "/../defaultmodules.js");
 var NodeHelper = require("node_helper");
 
 module.exports = NodeHelper.create({
@@ -8,22 +12,50 @@ module.exports = NodeHelper.create({
 	updateTimer: null,
 
 	start: function () {
-		
+	},
+
+	configureModules: function(modules) {
+		for (moduleName in modules) {
+			if (defaultModules.indexOf(moduleName) < 0) {
+				// Default modules are included in the main MagicMirror repo
+				var moduleFolder =  path.normalize(__dirname + "/../../" + moduleName);
+
+				var stat;
+				try {
+					stat = fs.statSync(path.join(moduleFolder, '.git'));
+				} catch(err) {
+					// Error when directory .git doesn't exist
+					// This module is not managed with git, skip
+					continue;
+				}
+
+				simpleGits.push({"module": moduleName, "git": SimpleGit(moduleFolder)});
+			}
+		}
+
+		// Push MagicMirror itself last, biggest chance it'll show up last in UI and isn't overwritten
+		simpleGits.push({"module": "default", "git": SimpleGit(path.normalize(__dirname + "/../../../"))});
 	},
 
 	socketNotificationReceived: function (notification, payload) {
 		if (notification === "CONFIG") {
 			this.config = payload;
+		} else if(notification === "MODULES") {
+			this.configureModules(payload);
 			this.preformFetch();
 		}
 	},
 
 	preformFetch() {
 		var self = this;
-		simpleGit.fetch().status(function(err, data) {
-			if (!err) {
-				self.sendSocketNotification("STATUS", data);
-			}
+
+		simpleGits.forEach(function(sg) {
+			sg.git.fetch().status(function(err, data) {
+				data.module = sg.module;
+				if (!err) {
+					self.sendSocketNotification("STATUS", data);
+				}
+			});
 		});
 
 		this.scheduleNextFetch(this.config.updateInterval);

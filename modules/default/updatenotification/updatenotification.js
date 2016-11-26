@@ -1,7 +1,5 @@
 Module.register("updatenotification", {
 
-
-
 	defaults: {
 		updateInterval: 10 * 60 * 1000, // every 10 minutes
 	},
@@ -10,12 +8,13 @@ Module.register("updatenotification", {
 
 	start: function () {
 		Log.log("Start updatenotification");
-		
+
 	},
 
 	notificationReceived: function(notification, payload, sender) {
 		if (notification === "DOM_OBJECTS_CREATED") {
 			this.sendSocketNotification("CONFIG", this.config);
+			this.sendSocketNotification("MODULES", Module.definitions);
 			this.hide(0,{lockString: self.identifier});
 		}
 	},
@@ -49,7 +48,11 @@ Module.register("updatenotification", {
 			message.appendChild(icon);
 
 			var text = document.createElement("span");
-			text.innerHTML = this.translate("UPDATE_NOTIFICATION");
+			if (this.status.module == "default") {
+				text.innerHTML = this.translate("UPDATE_NOTIFICATION");
+			} else {
+				text.innerHTML = this.translate("UPDATE_NOTIFICATION_MODULE").replace("MODULE_NAME", this.status.module);
+			}
 			message.appendChild(text);
 
 			wrapper.appendChild(message);
