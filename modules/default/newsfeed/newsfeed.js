@@ -72,6 +72,19 @@ Module.register("newsfeed",{
 			this.loaded = true;
 		}
 	},
+	
+	notificationReceived: function(notification, payload) {
+		
+		if(notification === "ADD_FEED") {
+			this.sendSocketNotification("ADD_FEED", {
+				feed: payload,
+				config: this.config
+			});
+		}
+		else if(notification === "REMOVE_FEED") {
+			this.removeFeed(payload.url);
+		}
+	},
 
 	// Override dom generator.
 	getDom: function() {
@@ -184,6 +197,17 @@ Module.register("newsfeed",{
 				config: this.config
 			});
 		}
+	},
+	
+	/* removeFeed(url)
+	 * Requests node helper to remove a feed.
+	 *
+	 * argument url sting - Url to remove.
+	 */
+	removeFeed: function(url) {
+		this.sendSocketNotification("REMOVE_FEED", {
+			url: url
+		});
 	},
 
 	/* registerFeeds()

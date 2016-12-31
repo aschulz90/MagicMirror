@@ -182,6 +182,13 @@ var CalendarFetcher = function(url, reloadInterval, maximumEntries, maximumNumbe
 			fetchCalendar();
 		}, reloadInterval);
 	};
+	
+	/* stopTimer()
+	 * Stop the timer for the next update.
+	 */
+	var stopTimer = function() {
+		clearTimeout(reloadTimer);
+	};
 
 	/* isFullDayEvent(event)
 	 * Checks if an event is a fullday event.
@@ -214,6 +221,13 @@ var CalendarFetcher = function(url, reloadInterval, maximumEntries, maximumNumbe
 	 */
 	this.startFetch = function() {
 		fetchCalendar();
+	};
+	
+	/* stopFetch()
+	 * Stop updating.
+	 */
+	this.stopFetch = function() {
+		stopTimer();
 	};
 
 	/* broadcastItems()

@@ -96,6 +96,16 @@ Module.register("calendar", {
 
 		this.updateDom(this.config.animationSpeed);
 	},
+	
+	notificationReceived: function(notification, payload) {
+		
+		if(notification === "ADD_CALENDAR") {
+			this.addCalendar(payload.url, payload.user, payload.pass);
+		}
+		else if(notification === "REMOVE_CALENDAR") {
+			this.removeCalendar(payload.url);
+		}
+	},
 
 	// Override dom generator.
 	getDom: function () {
@@ -290,10 +300,12 @@ Module.register("calendar", {
 		return events.slice(0, this.config.maximumEntries);
 	},
 
-	/* createEventList(url)
+	/* addCalendar(url, user, pass)
 	 * Requests node helper to add calendar url.
 	 *
 	 * argument url sting - Url to add.
+	 * argument user sting - User to use for authentification.
+	 * argument pass sting - Password to use for authentification.
 	 */
 	addCalendar: function (url, user, pass) {
 		this.sendSocketNotification("ADD_CALENDAR", {
@@ -303,6 +315,17 @@ Module.register("calendar", {
 			fetchInterval: this.config.fetchInterval,
 			user: user,
 			pass: pass
+		});
+	},
+	
+	/* removeCalendar(url)
+	 * Requests node helper to remove calendar url.
+	 *
+	 * argument url sting - Url to remove.
+	 */
+	removeCalendar: function(url) {
+		this.sendSocketNotification("REMOVE_CALENDAR", {
+			url: url
 		});
 	},
 

@@ -22,6 +22,9 @@ module.exports = NodeHelper.create({
 			this.createFetcher(payload.feed, payload.config);
 			return;
 		}
+		else if (notification === "REMOVE_FEED") {
+			this.removeFetcher(payload.url);
+		}
 	},
 
 	/* createFetcher(url, reloadInterval)
@@ -69,6 +72,28 @@ module.exports = NodeHelper.create({
 		}
 
 		fetcher.startFetch();
+	},
+	
+	/* removeFetcher(url)
+	 * Removes a fetcher from the fetcher list and stops it.
+	 *
+	 * attribute url string - URL of the calendar.
+	 */
+	removeFetcher: function(url) {
+		if (!validUrl.isUri(url)) {
+			this.sendSocketNotification("INCORRECT_URL", {url: url});
+			return;
+		}
+		
+		for(var i=0; i < this.fetchers.length; i++) {
+			var fetcher = this.fetchers[i];
+			console.log(fetcher.url() + " : " + url + " : " + (fetcher.url() === url));
+			if(fetcher.url() === url) {
+				fetcher.stopFetch();
+				this.fetchers.splice(i,1);
+				break;
+			}
+		}
 	},
 
 	/* broadcastFeeds()

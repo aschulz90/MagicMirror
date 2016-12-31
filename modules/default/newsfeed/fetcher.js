@@ -99,6 +99,13 @@ var Fetcher = function(url, reloadInterval, encoding) {
 			fetchNews();
 		}, reloadInterval);
 	};
+	
+	/* stopTimer()
+	 * Stop the timer for the next update.
+	 */
+	var stopTimer = function() {
+		clearTimeout(reloadTimer);
+	};
 
 	/* public methods */
 
@@ -118,6 +125,13 @@ var Fetcher = function(url, reloadInterval, encoding) {
 	 */
 	this.startFetch = function() {
 		fetchNews();
+	};
+	
+	/* stopFetch()
+	 * Stop updating.
+	 */
+	this.stopFetch = function() {
+		stopTimer();
 	};
 
 	/* broadcastItems()
