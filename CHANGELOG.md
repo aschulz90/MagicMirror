@@ -44,6 +44,7 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 - Remove extensive logging in newsfeed node helper.
 - Calendar times are now uniformly capitalized.
 - Modules are now secure, and Helmet is now used to prevent abuse of the Mirror's API.
+- Calendars and Newsfeeds can now be removed and added by other modules with a notification.
 
 ### Fixed
 - Solve an issue where module margins would appear when the first module of a section was hidden.
