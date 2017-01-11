@@ -324,9 +324,11 @@ Module.register("calendar", {
 	 * argument url sting - Url to remove.
 	 */
 	removeCalendar: function(url) {
-		this.sendSocketNotification("REMOVE_CALENDAR", {
-			url: url
-		});
+		if (this.hasCalendarURL(payload.url)) {
+			this.sendSocketNotification("REMOVE_CALENDAR", {
+				url: url
+			});
+		}
 	},
 
 	/* symbolForUrl(url)

@@ -76,10 +76,7 @@ Module.register("newsfeed",{
 	notificationReceived: function(notification, payload) {
 		
 		if(notification === "ADD_FEED") {
-			this.sendSocketNotification("ADD_FEED", {
-				feed: payload,
-				config: this.config
-			});
+			this.addFeed(payload);
 		}
 		else if(notification === "REMOVE_FEED") {
 			this.removeFeed(payload.url);
@@ -192,11 +189,20 @@ Module.register("newsfeed",{
 	registerFeeds: function() {
 		for (var f in this.config.feeds) {
 			var feed = this.config.feeds[f];
-			this.sendSocketNotification("ADD_FEED", {
-				feed: feed,
-				config: this.config
-			});
+			this.addFeed(feed);
 		}
+	},
+	
+	/* addFeed(feed)
+	 * Requests node helper to add news feed.
+	 *
+	 * argument feed object - Feed to add.
+	 */
+	addFeed: function(feed) {
+		this.sendSocketNotification("ADD_FEED", {
+			feed: feed,
+			config: this.config
+		});
 	},
 	
 	/* removeFeed(url)
@@ -205,9 +211,29 @@ Module.register("newsfeed",{
 	 * argument url sting - Url to remove.
 	 */
 	removeFeed: function(url) {
-		this.sendSocketNotification("REMOVE_FEED", {
-			url: url
-		});
+		if(hasNewsFeed(url)) {
+			this.sendSocketNotification("REMOVE_FEED", {
+				url: url
+			});
+		}
+	},
+	
+	/* hasNewsFeed(url)
+	 * Check if this config contains the news feed url.
+	 *
+	 * argument url sting - Url to look for.
+	 *
+	 * return bool - Has news feed url
+	 */
+	hasNewsFeed: function (url) {
+		for (var c in this.config.feeds) {
+			var feed = this.config.feeds[c];
+			if (feed.url === url) {
+				return true;
+			}
+		}
+
+		return false;
 	},
 
 	/* registerFeeds()
